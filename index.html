@@ -3,19 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>rOlex PSWDKeeper</title>
+  <title>rOlex PSWDKPR</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      text-align: center;
-      align-items: center;
+        font-family: Arial, sans-serif;
+        margin: 0; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh; 
+        text-align: center; 
     }
     select, input, button {
       padding: 10px;
       font-size: 16px;
       margin: 5px;
+      width: 150px;
     }
+    select, button {
+      width: 175px;
+    }
+    
     #qrcode {
       margin-top: 20px;
     }
@@ -48,10 +56,10 @@
   </style>
 </head>
 <body>
-  <h1 style="color: blue;">rOlex PSWDKeeper</h1>
+  
 
-  <div style="justify-content: center;">
-
+  <div style="justify-content: center; max-width: 230px;">
+    <h1 style="color: blue;">rOlex PSWDKPR</h1>
     <!-- Выпадающий список -->
     <select id="passwords">
       <option value="" disabled selected>Choose a service</option>
