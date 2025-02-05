@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>rOlex PSWDKeeper</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      text-align: center;
+      align-items: center;
+    }
+    select, input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 5px;
+    }
+    #qrcode {
+      margin-top: 20px;
+    }
+    #password-list {
+      margin-top: 20px;
+    }
+
+    @keyframes colorChange {
+    0% {
+      color: red;
+    }
+    25% {
+      color: yellow;
+    }
+    50% {
+      color: green;
+    }
+    75% {
+      color: blue;
+    }
+    100% {
+      color: purple;
+    }
+  }
+
+  h1 {
+    animation: colorChange 3s infinite;
+  }
+
+  </style>
+</head>
+<body>
+  <h1 style="color: blue;">rOlex PSWDKeeper</h1>
+
+  <div style="justify-content: center;">
+
+    <!-- Выпадающий список -->
+    <select id="passwords">
+      <option value="" disabled selected>Choose a service</option>
+    </select>
+    <button id="delete-password" onclick="return confirm('Wanna delete this?')">Delete Selected</button>
+
+    <!-- QR-код -->
+    <div style="display: flex; justify-content: center; align-items: center;">
+      <div id="qrcode"></div>
+    </div>
+
+    <!-- Поля для добавления нового пароля -->
+    <div id="password-list">
+      <input type="text" id="service-name" placeholder="Service Name" />
+      <input type="text" id="service-password" placeholder="Password" />
+      <button id="add-password">Add Password</button>
+    </div>
+  </div>
+
+  <!-- QRCode.js -->
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+  <script>
+    const qrCodeElement = document.getElementById('qrcode');
+    const dropdown = document.getElementById('passwords');
+    const addButton = document.getElementById('add-password');
+    const deleteButton = document.getElementById('delete-password');
+    const serviceNameInput = document.getElementById('service-name');
+    const servicePasswordInput = document.getElementById('service-password');
+
+    // Получение паролей из LocalStorage или создание начального объекта
+    let passwords = JSON.parse(localStorage.getItem('passwords')) || {
+      Email: 'password123',
+      Bank: 'myp@ssword!',
+    };
+
+    // Сохранение паролей в LocalStorage
+    function savePasswords() {
+      localStorage.setItem('passwords', JSON.stringify(passwords));
+    }
+
+    // Обновление выпадающего списка
+    function updateDropdown() {
+      dropdown.innerHTML = '<option value="" disabled selected>Choose a service</option>';
+      for (const [service, password] of Object.entries(passwords)) {
+        const option = document.createElement('option');
+        option.value = password;
+        option.textContent = service;
+        dropdown.appendChild(option);
+      }
+    }
+
+    // Генерация QR-кода
+    function generateQRCode(password) {
+      qrCodeElement.innerHTML = '';
+      if (password) {
+        new QRCode(qrCodeElement, {
+          text: password,
+          width: 200,
+          height: 200,
+        });
+      }
+    }
+
+    // Событие при выборе из списка
+    dropdown.addEventListener('change', function () {
+      const selectedPassword = this.value;
+      generateQRCode(selectedPassword);
+
+    });
+
+    // Добавление нового пароля
+    addButton.addEventListener('click', () => {
+      const serviceName = serviceNameInput.value.trim();
+      const servicePassword = servicePasswordInput.value.trim();
+
+      if (!serviceName || !servicePassword) {
+        alert('Please fill in both fields!');
+        return;
+      }
+
+      passwords[serviceName] = servicePassword;
+      savePasswords(); // Сохранить изменения в LocalStorage
+      updateDropdown();
+      serviceNameInput.value = '';
+      servicePasswordInput.value = '';
+    });
+
+    deleteButton.addEventListener('click', () => {
+      const selectedService = dropdown.options[dropdown.selectedIndex]?.text;
+      if (selectedService && passwords[selectedService]) {
+        delete passwords[selectedService];
+        savePasswords();
+        updateDropdown();
+        qrCodeElement.innerHTML = ''; 
+      } else {
+        alert('Please select a service to delete.');
+      }
+    });
+
+    updateDropdown();
+
+  </script>
+</body>
+</html>
